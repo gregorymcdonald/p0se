@@ -8,7 +8,7 @@ import javax.swing.JPanel;
 
 import com.github.sarxos.webcam.Webcam;
 
-public class P0sePanel extends JPanel{
+public class P0sePanel extends JPanel implements Runnable{
     /* Notes on Tags:
      * Tags are indicated by all-caps followed by colons in comments (e.g. "AAAAAA:")
      * They indicate some important information that could be relevant later in production
@@ -40,10 +40,41 @@ public class P0sePanel extends JPanel{
             System.out.println("Webcam: " + defaultWebcam.getName());
             defaultWebcam.open();
             backgroundImage = defaultWebcam.getImage();
-        } else {
+        }//if: able to find a webcam 
+        else {
             System.out.println("No webcam detected");
-        }
-    }//default: constructor
+            System.exit(1);
+        }//else: print error and exit
+        
+        //Image Capture Thread
+        Thread imageCaptureThread = new Thread(this);
+        imageCaptureThread.start();
+    }//constructor: default
+    
+    /* ***** RUNNABLE ***** */
+    public void run(){
+    	while(true){
+    		//System.out.println("Capturing image from webcam...");
+    		backgroundImage = defaultWebcam.getImage();
+    		repaint();
+    		delay(100);
+    	}//while: forever
+    }//method: run
+    
+    private boolean delay(int milliseconds){
+    	try{
+    		Thread.sleep(milliseconds);
+    		return true;
+    	}
+    	catch(Exception e){
+    		System.err.println("Delay of " + milliseconds + " ms failed.");
+    	}//catch: all exceptions
+    	return false;
+    }//method: delay
+    
+    /* ******************** */
+    /* ***** PAINTING ***** */
+    /* ******************** */
     
     public void paint(Graphics g){
         int panelWidth = this.getWidth();
@@ -54,7 +85,7 @@ public class P0sePanel extends JPanel{
         g.fillRect(0, 0, panelWidth, panelHeight);
         
         if(backgroundImage != null){
-            g.drawImage(backgroundImage, 0, 0, null);
+            g.drawImage(backgroundImage, 0, 0, panelWidth, panelHeight, null);
         }//if: backgroundImage is not null
         
         //Draw DEBUG information
