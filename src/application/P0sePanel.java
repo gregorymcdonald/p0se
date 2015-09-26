@@ -2,8 +2,11 @@ package application;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
+
+import com.github.sarxos.webcam.Webcam;
 
 public class P0sePanel extends JPanel{
     /* Notes on Tags:
@@ -20,14 +23,26 @@ public class P0sePanel extends JPanel{
     /* ***** JPANEL FIELDS ***** */
     private static final long serialVersionUID = -1; //serialVersionUID, used by Serializable
     
-    /* ***** P0SE FIELDS ***** */
+    /* ***** DISPLAY FIELDS ***** */
     private static final boolean DEBUG_MODE = true;
     private static Color debugColor = new Color(255,0,0);
     private static Color defaultBackgroundColor = new Color(100, 149, 237);
+    private static BufferedImage backgroundImage;
+    
+    /* ***** P0SE FIELDS ***** */
+    private static Webcam defaultWebcam;
     
     /* ***** CONSTRUCTORS ***** */
     public P0sePanel(){
-
+        //Get the webcam
+        defaultWebcam = Webcam.getDefault();
+        if (defaultWebcam != null) {
+            System.out.println("Webcam: " + defaultWebcam.getName());
+            defaultWebcam.open();
+            backgroundImage = defaultWebcam.getImage();
+        } else {
+            System.out.println("No webcam detected");
+        }
     }//default: constructor
     
     public void paint(Graphics g){
@@ -37,6 +52,10 @@ public class P0sePanel extends JPanel{
         //Draw background - REMOVE: at release, or when backgroundImage is implemented
         g.setColor(defaultBackgroundColor);
         g.fillRect(0, 0, panelWidth, panelHeight);
+        
+        if(backgroundImage != null){
+            g.drawImage(backgroundImage, 0, 0, null);
+        }//if: backgroundImage is not null
         
         //Draw DEBUG information
         if(DEBUG_MODE){
