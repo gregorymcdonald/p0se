@@ -16,6 +16,9 @@ import colorutil.ColorTolerance;
 
 public class P0seRecognizer {
 	
+	Pose currentPose;
+	Boolean called = false;
+	
 	private static Color[] jointNodeColors = {
         new Color(48, 114, 139),
         new Color(167, 175, 71)
@@ -32,10 +35,13 @@ public class P0seRecognizer {
 		
 		for(int color = 0; color < jointNodeColors.length; color++){
 			Color currentColor = jointNodeColors[color];
-			ColorTolerance tolerance = new ColorTolerance(60);
-			JointNode node = new JointNode(ColorFinder.findColor(image, jointNodeColors[color], tolerance), currentColor, color, new ColorTolerance(60));
-			jointNodes.add(node);	
+			JointNode node = new JointNode(ColorFinder.findColor(image, jointNodeColors[color], new ColorTolerance(60)), currentColor, color, new ColorTolerance(60));
+			if(node != null){
+				jointNodes.add(node);
+			}	
 		}
+		
+		currentPose = new Pose(jointNodes);
 	}
 	
 	/*
@@ -44,11 +50,18 @@ public class P0seRecognizer {
 	 * Return: Returns the pose in storage if there was a match, null otherwise.
 	 */
 	public void compareCurrentPose(){
-		Pose currentPose = new Pose(jointNodes);
-		Pose hardcodedPose = new Pose(jointNodes);
+		//Pose currentPose = new Pose(jointNodes);
+		ArrayList<Double> testObject = new ArrayList<Double>();
+		
+		testObject.add(0.0);
+		testObject.add(270.0);
+		
+		Pose hardcodedPose = new Pose(testObject,1);
+		
+		System.out.println(currentPose.getAngles());
 		Runtime rt = Runtime.getRuntime();
 		
-		if(currentPose.equals(hardcodedPose)){
+		if(currentPose.equals(hardcodedPose, 30) && called == false){
 			 try {
 			        rt.exec(new String[]{"open", "-a", "Google Chrome", "--new", "--args"});
 			    	 //rt.exec(new String[]{"spotify_cmd Next"});
@@ -57,8 +70,9 @@ public class P0seRecognizer {
 			        // TODO Auto-generated catch block
 			        e.printStackTrace();
 			    }
+			 called = true;
 		}else{
-			System.out.println("Failed Test");
+			//System.out.println("Failed Test");
 		}
 	}
 }

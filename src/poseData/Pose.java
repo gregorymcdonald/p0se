@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public class Pose {
 	private ArrayList <JointNode> joints;
-	private ArrayList<Double> angles;
+	private ArrayList<Double> angles = new ArrayList<Double>();
 	private int id;
 	
 	// Static Vars
@@ -22,7 +22,7 @@ public class Pose {
 		id = 1;
 		takenIds.add(id);
 		this.joints = joints;
-		angles = generateAngles(this.joints);
+		this.angles = generateAngles(this.joints);
 	}
 	
 	public Pose(ArrayList<Double> angles, int id){
@@ -41,7 +41,7 @@ public class Pose {
 			double angle = calculateAngle(baseNode.getLoc(), joint.getLoc());
 			angles.add(angle);
 		}
-		return new ArrayList<Double>();
+		return angles;
 	}
 	
 	private double calculateAngle(Point a, Point b){
@@ -104,5 +104,9 @@ public class Pose {
 		}
 		sc.close();
 		return new Pose(readAngles, id);
+	}
+	
+	public ArrayList<Double> getAngles(){
+		return this.angles;
 	}
 }

@@ -97,6 +97,7 @@ public class P0sePanel extends JPanel implements Runnable{
     	while(true){
     		//System.out.println("Capturing image from webcam...");
     		inputImage = inputDevice.getImage();
+    		p0seRecognizer.updateNodeLocations(inputImage);
     		p0seRecognizer.compareCurrentPose();
     		repaint();
     		delay(100);
