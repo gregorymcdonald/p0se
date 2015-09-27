@@ -17,8 +17,7 @@ public class Executable {
     }//constructor: all fields initiated
     
     public boolean execute(){
-        String operatingSystemName = System.getProperty("os.name");
-        if(operatingSystemName.startsWith(compatibleOperatingSystemHeader)){
+        if(compatibleWithOperatingSystem()){
             Runtime rt = Runtime.getRuntime();
             try{
                 rt.exec(execStatement);
@@ -35,6 +34,11 @@ public class Executable {
             return false;
         }//else: not running on a compatible operating system
     }//method: execute
+    
+    public boolean compatibleWithOperatingSystem(){
+        String operatingSystemName = System.getProperty("os.name");
+        return operatingSystemName.startsWith(compatibleOperatingSystemHeader);
+    }//method: compatibleWithOperatingSystem
     
     /* ***** ACCESSORS AND MUTATORS ***** */
     public String getCompatibleOperatingSystemHeader(){

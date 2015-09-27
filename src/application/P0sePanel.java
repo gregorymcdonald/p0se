@@ -136,11 +136,15 @@ public class P0sePanel extends JPanel implements Runnable{
     private void executeMappedStatements(Pose[] p0ses){
         for(Pose p0se : p0ses){
             if(!recentlyP0sed(p0se)){
-                P0seData.p0seExecutables_Windows.get(p0se).execute();
-                Executable macExec = P0seData.p0seExecutables_Mac.get(p0se);
-                if(macExec != null){
-                	macExec.execute();
-                }
+                Executable windowsExecutable = P0seData.p0seExecutables_Windows.get(p0se);
+                if(windowsExecutable != null && windowsExecutable.compatibleWithOperatingSystem()){
+                    windowsExecutable.execute();
+                }//if: windows executable can be executed
+                
+                Executable macExecutable = P0seData.p0seExecutables_Mac.get(p0se);
+                if(macExecutable != null && macExecutable.compatibleWithOperatingSystem()){
+                    macExecutable.execute();
+                }//if: mac executable can be executed
             }//if: not recently p0sed
         }//for: all p0ses
     }//method: executeMappedStatements
