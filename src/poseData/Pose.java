@@ -16,11 +16,11 @@ public class Pose {
 	private int id;
 	
 	// Static Vars
-	private static ArrayList<Integer> ids;
+	private static ArrayList<Integer> takenIds = new ArrayList<Integer>();;
 	
 	public Pose(ArrayList<JointNode> joints){
 		id = 1;
-		ids.add(id);
+		takenIds.add(id);
 		this.joints = joints;
 		angles = generateAngles(this.joints);
 	}
@@ -31,6 +31,10 @@ public class Pose {
 	}
 	
 	private ArrayList<Double> generateAngles(ArrayList<JointNode> joints){
+	    if(joints == null || joints.isEmpty()){
+	        return new ArrayList<Double>();
+	    }//if: invalid input
+	    
 		// Angles to be calculated in reference to the first joint in the list
 		JointNode baseNode = joints.get(0);
 		for(JointNode joint : joints){

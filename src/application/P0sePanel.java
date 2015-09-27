@@ -12,6 +12,8 @@ import colorutil.ColorFinder;
 import colorutil.ColorTolerance;
 import colorutil.ColorUtil;
 
+import P0seRecognizer.P0seRecognizer;
+
 import com.github.sarxos.webcam.Webcam;
 
 public class P0sePanel extends JPanel implements Runnable{
@@ -46,6 +48,7 @@ public class P0sePanel extends JPanel implements Runnable{
     private static Color taskbarBackgroundColor;
     
     /* ***** P0SE FIELDS ***** */
+    private static P0seRecognizer p0seRecognizer;
     private static Webcam inputDevice;
     private static ColorTolerance jointColorTolerance;
     private static Color[] jointColors = {
@@ -68,6 +71,7 @@ public class P0sePanel extends JPanel implements Runnable{
         taskbarBackgroundColor = new Color(255, 255, 255);
         
         //Default p0se values
+        p0seRecognizer = new P0seRecognizer();
         jointColorTolerance = new ColorTolerance(30);
         
         //Image Capture Thread
@@ -93,6 +97,7 @@ public class P0sePanel extends JPanel implements Runnable{
     	while(true){
     		//System.out.println("Capturing image from webcam...");
     		inputImage = inputDevice.getImage();
+    		p0seRecognizer.compareCurrentPose();
     		repaint();
     		delay(100);
     	}//while: forever

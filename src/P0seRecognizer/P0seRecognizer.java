@@ -21,20 +21,20 @@ public class P0seRecognizer {
         new Color(167, 175, 71)
     };
 
-	ArrayList <JointNode> JointNodes = new ArrayList<JointNode>();
+	ArrayList <JointNode> jointNodes = new ArrayList<JointNode>();
 	/*
 	 * Gets the current grid points of the nodes from the camera and updates the local map with variables the new Points
 	 * 
 	 * Must be called before compareCurrentPose()
 	 */
 	public void updateNodeLocations(BufferedImage image){
-		JointNodes = new ArrayList<JointNode>();//resets the array for the new NodeJoints that will be captured in the new image
+		jointNodes = new ArrayList<JointNode>();//resets the array for the new NodeJoints that will be captured in the new image
 		
 		for(int color = 0; color < jointNodeColors.length; color++){
 			Color currentColor = jointNodeColors[color];
 			ColorTolerance tolerance = new ColorTolerance(60);
 			JointNode node = new JointNode(ColorFinder.findColor(image, jointNodeColors[color], tolerance), currentColor, color, new ColorTolerance(60));
-			JointNodes.add(node);	
+			jointNodes.add(node);	
 		}
 	}
 	
@@ -44,8 +44,8 @@ public class P0seRecognizer {
 	 * Return: Returns the pose in storage if there was a match, null otherwise.
 	 */
 	public void compareCurrentPose(){
-		Pose currentPose = new Pose(JointNodes);
-		Pose hardcodedPose = new Pose(JointNodes);
+		Pose currentPose = new Pose(jointNodes);
+		Pose hardcodedPose = new Pose(jointNodes);
 		Runtime rt = Runtime.getRuntime();
 		
 		if(currentPose.equals(hardcodedPose)){
