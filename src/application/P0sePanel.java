@@ -73,6 +73,7 @@ public class P0sePanel extends JPanel implements Runnable{
         
         //Default p0se values
         P0seData.loadDefaultP0ses();
+        P0seData.loadDefaultExecutables();
         p0seRecognizer = new P0seRecognizer();
         recentP0ses = new ArrayList<P0seTimer>();
         

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import P0seRecognizer.Executable;
 import colorutil.ColorTolerance;
 import poseData.JointNode;
 import poseData.Pose;
@@ -63,4 +64,17 @@ public class P0seData {
     	}//for: all default p0ses
     	return null; //if not found
     }//method: findPose
+    
+    /* ***** P0SE - EXECUTABLE MAPPINGS ***** */
+    public static HashMap<Pose, Executable> p0seExecutables_Windows;
+    
+    public static Executable openChromeWindows = new Executable(new String[]{"cmd", "/c", "start", "chrome", "/new-window"}, Executable.WINDOWS_OS_HEADER);
+    public static Executable openChromeMac = new Executable(new String[]{"open", "-a", "Google Chrome", "--new", "--args"}, Executable.MAC_OS_HEADER);
+    
+    //Must be called after loadDefaultP0ses
+    public static void loadDefaultExecutables(){
+        p0seExecutables_Windows = new HashMap<Pose, Executable>();
+        
+        p0seExecutables_Windows.put(findPose("Yellow over Blue"), openChromeWindows);
+    }//method: loadDefaultExecutables
 }//class: P0seData
