@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Pose {
+	private String name;
 	private ArrayList <JointNode> joints;
 	private ArrayList<Double> angles = new ArrayList<Double>();
 	private int id;
@@ -19,6 +20,7 @@ public class Pose {
 	private static ArrayList<Integer> takenIds = new ArrayList<Integer>();;
 	
 	public Pose(ArrayList<JointNode> joints){
+		name = "NO NAME";
 		id = 1;
 		takenIds.add(id);
 		this.joints = joints;
@@ -26,6 +28,7 @@ public class Pose {
 	}
 	
 	public Pose(ArrayList<Double> angles, int id){
+		name = "NO NAME";
 		this.id = id;
 		this.angles = angles;
 	}
@@ -118,4 +121,19 @@ public class Pose {
 	public ArrayList<Double> getAngles(){
 		return this.angles;
 	}
-}
+	
+	/* ***** MUTATORS AND ACCESSORS ***** */
+	public int getID(){
+		return id;
+	}//method: getID
+	
+	public String getName(){
+		return name;
+	}//method: getName
+	
+	public void setName(String name){
+		if(name != null && name.length() > 0){
+			this.name = name;
+		}//if: name is valid
+	}//method: setName
+}//class: P0se

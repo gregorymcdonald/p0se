@@ -6,6 +6,8 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
+import java.util.ArrayList;
+
 import javax.swing.JPanel;
 
 import colorutil.ColorFinder;
@@ -13,6 +15,8 @@ import colorutil.ColorTolerance;
 import colorutil.ColorUtil;
 
 import P0seRecognizer.P0seRecognizer;
+
+import poseData.Pose;
 
 import com.github.sarxos.webcam.Webcam;
 
@@ -41,6 +45,8 @@ public class P0sePanel extends JPanel implements Runnable{
     private static final boolean FIT_INPUT_DISPLAY_AREA = true;
     private static final boolean HIGHLIGHT_JOINT_COLOR_REGIONS = false;
     private static final boolean HIGHLIGHT_AVERAGE_COLOR_POINTS = true;
+    private static final int INPUT_DELAY = 100; //in milliseconds
+    private static final int RECENT_DELAY = 3000; //in milliseconds
     private static Rectangle inputDisplayArea;
     private static BufferedImage inputImage;
     //Taskbar Display
@@ -50,12 +56,7 @@ public class P0sePanel extends JPanel implements Runnable{
     /* ***** P0SE FIELDS ***** */
     private static P0seRecognizer p0seRecognizer;
     private static Webcam inputDevice;
-    //private static ColorTolerance jointColorTolerance;
-    //private static Color[] jointColors = {
-    //    new Color(255, 255, 255),
-    //    new Color(48, 114, 139),
-    //    new Color(167, 175, 71)
-    //};
+    private static ArrayList<P0seTimer> recentP0ses;
     
     /* ***** CONSTRUCTORS ***** */
     public P0sePanel(){
@@ -71,8 +72,9 @@ public class P0sePanel extends JPanel implements Runnable{
         taskbarBackgroundColor = new Color(255, 255, 255);
         
         //Default p0se values
+        P0seData.loadDefaultP0ses();
         p0seRecognizer = new P0seRecognizer();
-        //jointColorTolerance = new ColorTolerance(30);
+        recentP0ses = new ArrayList<P0seTimer>();
         
         //Image Capture Thread
         Thread imageCaptureThread = new Thread(this);
@@ -97,10 +99,24 @@ public class P0sePanel extends JPanel implements Runnable{
     	while(true){
     		//System.out.println("Capturing image from webcam...");
     		inputImage = inputDevice.getImage();
-    		p0seRecognizer.updateNodeLocations(inputImage);
-    		p0seRecognizer.compareCurrentPose();
+    		
+    		//p0seRecognizer.updateNodeLocations(inputImage);
+    		//p0seRecognizer.compareCurrentPose();
+    		
+    		//Decrement time remaining on recent p0ses
+    		updateRecentP0ses();
+    		
+    		Pose currentPose = p0seRecognizer.getPose(inputImage);
+    		//Match with default p0ses
+    		Pose[] matchingP0ses = p0seRecognizer.matchPose(currentPose, P0seData.defaultP0ses);
+    		//execute matching poses
+    		
+    		//add to recent p0ses
+    		addToRecentP0ses(matchingP0ses);
+    		
+    		
     		repaint();
-    		delay(100);
+    		delay(INPUT_DELAY);
     	}//while: forever
     }//method: run
     
@@ -114,6 +130,36 @@ public class P0sePanel extends JPanel implements Runnable{
     	}//catch: all exceptions
     	return false;
     }//method: delay
+  
+    private void updateRecentP0ses(){
+    	for(int i = 0; i < recentP0ses.size(); i++){
+    		P0seTimer recentP0se = recentP0ses.get(i);
+    		recentP0se.tick(INPUT_DELAY);
+    		if(recentP0se.timerReached()){
+    			recentP0ses.remove(i);
+    			i--;
+    		}//if: the recent p0se's time has elapsed
+    	}//for: all recent p0ses
+    }//method: updateRecentP0ses
+  
+    private boolean recentlyP0sed(Pose p0se){
+    	for(int i = 0; i < recentP0ses.size(); i++){
+    		Pose recentP0se = recentP0ses.get(i).p0se;
+    		if(p0se.equals(recentP0se)){
+    			return true;
+    		}//if: p0se is recent
+    	}//for: all recent p0ses
+    	return false;
+    }//method: recentlyP0sed
+    
+    private void addToRecentP0ses(Pose[] p0ses){
+    	for(int i = 0; i < p0ses.length; i++){
+    		if(!recentlyP0sed(p0ses[i])){
+    			P0seTimer recentP0se = new P0seTimer(p0ses[i], RECENT_DELAY);
+    			recentP0ses.add(recentP0se);
+    		}//if: the p0se was not recently p0sed
+    	}//for: all input p0ses
+    }//method: addToRecentP0ses
     
     /* ******************** */
     /* ***** PAINTING ***** */
@@ -258,84 +304,6 @@ public class P0sePanel extends JPanel implements Runnable{
                 }//else: image does not fill display area
             }//if: HIGHLIGHT_JOINT_COLOR_REGIONS is true
         }//for: all joint color pairs, in the default array
-        
-        /*
-        if(HIGHLIGHT_AVERAGE_COLOR_POINTS){
-            for(Color jointColor : jointColors){
-                Color negativeJointColor = ColorUtil.negateColor(jointColor);
-                g.setColor(negativeJointColor);
-                if(FIT_INPUT_DISPLAY_AREA){
-                    Point matchingPoint = ColorFinder.findColor(inputImage, jointColor, jointColorTolerance);
-                    if(matchingPoint == null){
-                        continue;
-                    }//if: no matching point was found
-                    
-                    double widthRatio = ((double)inputDisplayArea.width) / ((double)inputImage.getWidth());
-                    double heightRatio = ((double)inputDisplayArea.height) / ((double)inputImage.getHeight());
-                    if(heightRatio >= widthRatio){
-                        heightRatio = widthRatio;
-                    }//if: the height ratio is greater than the width ratio, scale by width
-                    else{
-                        widthRatio = heightRatio;
-                    }//else: the width ratio is greater, scale by height
-                    int centerXOffset = (int)Math.round(inputDisplayArea.width / 2.0 - ((inputImage.getWidth() * widthRatio) / 2.0));
-                    int centerYOffset = (int)Math.round(inputDisplayArea.height / 2.0 - ((inputImage.getHeight() * heightRatio) / 2.0));
-                    int scaledX = (int)Math.round(matchingPoint.x * widthRatio);
-                    int scaledY = (int)Math.round(matchingPoint.y * heightRatio);
-                    g.fillOval(scaledX + centerXOffset, scaledY + centerYOffset, 10, 10);
-                }//if: fitting input to display area
-            }//for: all joint colors
-        }//if: HIGHLIGHT_AVERAGE_COLOR_POINTS
-        if(HIGHLIGHT_JOINT_COLOR_REGIONS){
-            for(Color jointColor : jointColors){
-                Rectangle[] matchingTiles = ColorFinder.findColorRegions(inputImage, jointColor, jointColorTolerance);
-                
-                //Draw rectangles of matched tiles
-                Color negativeJointColor = ColorUtil.negateColor(jointColor);
-                g.setColor(negativeJointColor);
-                if(FILL_INPUT_DISPLAY_AREA){
-                    double widthRatio = ((double)inputDisplayArea.width) / ((double)inputImage.getWidth());
-                    double heightRatio = ((double)inputDisplayArea.height) / ((double)inputImage.getHeight());
-                    for(Rectangle rect : matchingTiles){
-                        int scaledX = (int)Math.round(rect.x * widthRatio);
-                        int scaledY = (int)Math.round(rect.y * heightRatio);
-                        int scaledWidth = (int)Math.round(rect.width * widthRatio);
-                        int scaledHeight = (int)Math.round(rect.height * heightRatio);
-                        g.drawRect(scaledX, scaledY, scaledWidth, scaledHeight);
-                    }//for: all matching tiles
-                }//if: image is set to fill the input display area
-                else if(FIT_INPUT_DISPLAY_AREA){
-                    double widthRatio = ((double)inputDisplayArea.width) / ((double)inputImage.getWidth());
-                    double heightRatio = ((double)inputDisplayArea.height) / ((double)inputImage.getHeight());
-                    if(heightRatio >= widthRatio){
-                        heightRatio = widthRatio;
-                    }//if: the height ratio is greater than the width ratio, scale by width
-                    else{
-                        widthRatio = heightRatio;
-                    }//else: the width ratio is greater, scale by height
-                    
-                    int centerXOffset = (int)Math.round(inputDisplayArea.width / 2.0 - ((inputImage.getWidth() * widthRatio) / 2.0));
-                    int centerYOffset = (int)Math.round(inputDisplayArea.height / 2.0 - ((inputImage.getHeight() * heightRatio) / 2.0));
-                    for(Rectangle rect : matchingTiles){
-                        int scaledX = (int)Math.round(rect.x * widthRatio);
-                        int scaledY = (int)Math.round(rect.y * heightRatio);
-                        int scaledWidth = (int)Math.round(rect.width * widthRatio);
-                        int scaledHeight = (int)Math.round(rect.height * heightRatio);
-                        g.drawRect(scaledX + centerXOffset, scaledY + centerYOffset, scaledWidth, scaledHeight);
-                        //g.drawRect(scaledX, scaledY, scaledWidth, scaledHeight);
-                    }//for: all matching tiles
-                }//else if: image is set to fit to input display area
-                else{
-                    //TODO: Make this inputDisplayArea handle height being too small
-                    int centerXOffset = inputDisplayArea.width / 2 - inputImage.getWidth() / 2;
-                    int centerYOffset = inputDisplayArea.height / 2 - inputImage.getHeight() / 2;
-                    for(Rectangle rect : matchingTiles){
-                        g.drawRect(rect.x + centerXOffset, rect.y + centerYOffset, rect.width, rect.height);
-                    }//for: all matching tiles
-                }//else: image does not fill display area
-            }//for: all colors in jointColor
-        }//if: HIGHLIGHT_JOINT_COLOR_REGIONS is true
-        */
     }//method: highlight
     
     private void drawTaskbar(Graphics g){
@@ -354,6 +322,16 @@ public class P0sePanel extends JPanel implements Runnable{
             String debugModeDisclaimer = "DEBUG MODE";
             g.drawString(debugModeDisclaimer, debugDrawX, debugDrawY);
             debugDrawY += 15; //MODIFY: Replace with code to determine the height of the previous string based on font
+        
+            //Draw Recent P0ses
+            String recentP0sesHeader = "Recent p0ses:";
+            g.drawString(recentP0sesHeader, debugDrawX, debugDrawY);
+            debugDrawY += 15;
+            for(P0seTimer recentP0se : recentP0ses){
+            	String recentP0seName = recentP0se.p0se.getName();
+                g.drawString(recentP0seName, debugDrawX, debugDrawY);
+                debugDrawY += 15;
+            }//for: all recent p0ses
         }//if: in debug mode
     }//method: drawDebugInfo
 }//class: P0sePanel

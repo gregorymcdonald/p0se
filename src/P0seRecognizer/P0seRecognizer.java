@@ -16,22 +16,18 @@ import colorutil.ColorTolerance;
 
 public class P0seRecognizer {
 
+	private static final int POSE_MATCH_TOLERANCE = 30;
+	
 	Pose currentPose;
 	Boolean called = false;
 
-	private static Color[] jointNodeColors = {
-		new Color(48, 114, 139),
-		new Color(167, 175, 71)
-	};
-
-	ArrayList <JointNode> jointNodes = new ArrayList<JointNode>();
 	/*
 	 * Gets the current grid points of the nodes from the camera and updates the local map with variables the new Points
 	 * 
 	 * Must be called before compareCurrentPose()
 	 */
 	public void updateNodeLocations(BufferedImage image){
-		jointNodes = new ArrayList<JointNode>();//resets the array for the new NodeJoints that will be captured in the new image
+		ArrayList <JointNode> jointNodes = new ArrayList<JointNode>();
 
 		for(int i = 0; i < P0seData.DEFAULT_JOINT_NODE_COLORS.length; i++){
 			Color currentColor = P0seData.DEFAULT_JOINT_NODE_COLORS[i].color;
@@ -45,25 +41,49 @@ public class P0seRecognizer {
 
 		currentPose = new Pose(jointNodes);
 	}
+	
+	public Pose getPose(BufferedImage image){
+		ArrayList <JointNode> jointNodes = new ArrayList<JointNode>();
 
+		for(int i = 0; i < P0seData.DEFAULT_JOINT_NODE_COLORS.length; i++){
+			Color currentColor = P0seData.DEFAULT_JOINT_NODE_COLORS[i].color;
+			ColorTolerance currentTolerance = P0seData.DEFAULT_JOINT_NODE_COLORS[i].tolerance;
+			Point colorLocation = ColorFinder.findColor(image, currentColor, currentTolerance);
+			if(colorLocation != null){
+				JointNode node = new JointNode(colorLocation, currentColor, i, currentTolerance);
+				jointNodes.add(node);
+			}
+		}
+
+		Pose result = new Pose(jointNodes);
+		return result;
+	}//method: readPose
+
+	public Pose[] matchPose(Pose pose, Pose[] potentialMatches){
+		ArrayList<Pose> matchedPoses = new ArrayList<Pose>();
+		
+		for(int i = 0; i < potentialMatches.length; i++){
+			if(pose.equals(potentialMatches[i], POSE_MATCH_TOLERANCE)){
+				matchedPoses.add(potentialMatches[i]);
+			}//if: pose matches the potential match
+		}//for: all potential matches
+		
+		Pose[] matchedPosesArray = new Pose[matchedPoses.size()];
+		return matchedPoses.toArray(matchedPosesArray);
+	}//method: matchPose
+	
 	/*
 	 * Compares the current P0se against those of stored P0ses to see if there is a match
 	 * 
 	 * Return: Returns the pose in storage if there was a match, null otherwise.
 	 */
 	public void compareCurrentPose(){
-		//Pose currentPose = new Pose(jointNodes);
-		ArrayList<Double> testObject = new ArrayList<Double>();
-
-		testObject.add(0.0);
-		testObject.add(270.0);
-
-		Pose hardcodedPose = new Pose(testObject,1);
+		Pose testP0se = P0seData.findPose("Yellow over Blue");
 
 		//System.out.println(currentPose.getAngles()); //DEBUGGING
 		Runtime rt = Runtime.getRuntime();
 
-		if(currentPose.equals(hardcodedPose, 30) && called == false){
+		if(currentPose.equals(testP0se, 30) && called == false){
 			if(System.getProperty("os.name").startsWith("Windows")){
 				try {
 					rt.exec(new String[]{"cmd", "/c", "start", "chrome", "/new-window"});
