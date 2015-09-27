@@ -10,10 +10,17 @@ public class ColorFinder {
     
     public static Rectangle[] findColor(BufferedImage image, Color color, ColorTolerance tolerance){
         Rectangle[] colorTiles = findMatchingTiles(image, color, tolerance);
-        ArrayList<ArrayList<Rectangle>> rectangleGroupings = new ArrayList<ArrayList<Rectangle>>();
+        if(colorTiles.length == 0){
+            return new Rectangle[0];
+        }//if: no color was found
         
         //Assemble adjacent rectangles into groups
-        for(Rectangle rect : colorTiles){
+        ArrayList<ArrayList<Rectangle>> rectangleGroupings = new ArrayList<ArrayList<Rectangle>>();
+        ArrayList<Rectangle> firstRectangleGroup = new ArrayList<Rectangle>();
+        firstRectangleGroup.add(colorTiles[0]);
+        rectangleGroupings.add(firstRectangleGroup);
+        for(int j = 1; j < colorTiles.length; j++){
+            Rectangle rect = colorTiles[j];
             boolean grouped = false;
             for(int i = 0; i < rectangleGroupings.size(); i++){
                 ArrayList<Rectangle> grouping = rectangleGroupings.get(i);
@@ -32,7 +39,7 @@ public class ColorFinder {
         System.out.println(rectangleGroupings.size() + " rectangle groupings found");
         
         //Construct overall color group rectangles
-        Rectangle[] colorGroups = new Rectangle[rectangleGroupings.size()];
+        ArrayList<Rectangle> colorGroups = new ArrayList<Rectangle>();
         for(int i = 0; i < rectangleGroupings.size(); i++){
             ArrayList<Rectangle> grouping = rectangleGroupings.get(i);
             int minX = Integer.MAX_VALUE;
@@ -57,9 +64,33 @@ public class ColorFinder {
             //Building the color group rectangle
             int groupWidth = maxX - minX + grouping.get(0).width;
             int groupHeight = maxY - minY + grouping.get(0).height;
-            colorGroups[i] = new Rectangle(minX, minY, groupWidth, groupHeight);
+            Rectangle colorGroup = new Rectangle(minX, minY, groupWidth, groupHeight);
+            colorGroups.add(colorGroup);
         }//for: all rectangle groupings
-        return colorGroups;
+        
+        //Merge color rectangles
+        ArrayList<Rectangle> mergedRectangles = new ArrayList<Rectangle>();
+        for(int i = 0; i < colorGroups.size(); i++){
+            Rectangle current = colorGroups.get(i);
+            for(int j = 0; j < colorGroups.size(); j++){
+                Rectangle mergeCandidate = colorGroups.get(j);
+                if(!mergeCandidate.equals(current)){
+                    if(current.intersects(mergeCandidate)){
+                        Rectangle mergeResult = mergeRectangles(current, mergeCandidate);
+                        mergedRectangles.add(mergeResult);
+                        
+                        //Remove merged rect, and adjust counters
+                        colorGroups.set(i, mergeResult);
+                        colorGroups.remove(j);
+                        j--;
+                    }
+                }//if: not looking at yourself
+            }//for: all rectangles in colorGroups
+        }//for: all rectangles in colorGroups
+        
+        //Convert to array
+        Rectangle[] mergedRectanglesArray = new Rectangle[mergedRectangles.size()];
+        return mergedRectangles.toArray(mergedRectanglesArray);
     }//method: findColor
     
     private static boolean isAdjacent(Rectangle rect, ArrayList<Rectangle> otherRects){
@@ -71,6 +102,27 @@ public class ColorFinder {
         }//for: all Rectangles in otherRects
         return false;
     }//method: isAdjacent
+    
+    private static Rectangle mergeRectangles(Rectangle rect1, Rectangle rect2){
+        if(rect1 == null || rect2 == null){
+            return null;
+        }//if: invalid input
+        
+        //Merging
+        if(rect1.contains(rect2)){
+            return rect1;
+        }//if: rect1 entirely encompasses rect2
+        if(rect2.contains(rect1)){
+            return rect2;
+        }//if: rect2 entirely encompasses rect1
+        
+        //Building a merged rectangle
+        int minX = (rect1.x <= rect2.x) ? rect1.x : rect2.x;
+        int minY = (rect1.y <= rect2.y) ? rect1.y : rect2.y;
+        int maxX = (rect1.x + rect1.width <= rect2.x + rect2.width) ? rect1.x + rect1.width : rect2.x + rect2.width;
+        int maxY = (rect1.y + rect1.height <= rect2.y + rect2.height) ? rect1.y + rect1.height : rect2.y + rect2.height;
+        return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+    }//method: mergeRectangles
     
     public static Rectangle[] findMatchingTiles(BufferedImage image, Color color, ColorTolerance tolerance){
         ArrayList<Rectangle> matchingTiles = new ArrayList<Rectangle>();
