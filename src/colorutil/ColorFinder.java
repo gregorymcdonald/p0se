@@ -1,6 +1,7 @@
 package colorutil;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -8,10 +9,10 @@ import java.util.ArrayList;
 public class ColorFinder {
     private static final int TILE_SIZE_DIVISOR = 32;
     
-    public static Rectangle[] findColor(BufferedImage image, Color color, ColorTolerance tolerance){
+    public static Point findColor(BufferedImage image, Color color, ColorTolerance tolerance){
         Rectangle[] colorTiles = findMatchingTiles(image, color, tolerance);
         if(colorTiles.length == 0){
-            return new Rectangle[0];
+            return null;
         }//if: no color was found
         
         int totalX = 0;
@@ -20,10 +21,13 @@ public class ColorFinder {
             totalX += colorTiles[i].x;
             totalY += colorTiles[i].y;
         }//for: all color tiles
-        int averageX = (totalX / colorTiles.length);
-        int averageY = (totalY / colorTiles.length);
-        Rectangle[] result = new Rectangle[1];
-        result[0] = new Rectangle(averageX, averageY, 4, 4);
+        int averageX = (totalX / colorTiles.length) + (colorTiles[0].width / 2);
+        int averageY = (totalY / colorTiles.length) + (colorTiles[0].height / 2);
+        
+        //Result as rectangle
+        //Rectangle[] result = new Rectangle[1];
+        //result[0] = new Rectangle(averageX, averageY, 4, 4);
+        Point result = new Point(averageX, averageY);
         return result;
     }//method: findColor
     
