@@ -61,10 +61,12 @@ public class P0seRecognizer {
 		System.out.println(currentPose.getAngles());
 		Runtime rt = Runtime.getRuntime();
 
+		System.out.println(System.getProperty("os.name").startsWith("Windows"));
+		System.out.println(System.getProperty("os.name"));
 		if(currentPose.equals(hardcodedPose, 30) && called == false){
 			if(System.getProperty("os.name").startsWith("Windows")){
 				try {
-					rt.exec(new String[]{"cmd.exe","start", "chrome", "/new-window"});
+					rt.exec(new String[]{"cmd", "/c", "start", "chrome", "/new-window"});
 
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
