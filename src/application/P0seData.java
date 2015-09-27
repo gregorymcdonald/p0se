@@ -41,7 +41,7 @@ public class P0seData {
     
     public static void loadDefaultP0ses(){
     	//Initialize default HashMap
-    	defaultP0ses = new Pose[3];
+    	defaultP0ses = new Pose[4];
     	
     	int id = 0;
     	
@@ -62,6 +62,15 @@ public class P0seData {
     	johnCena.setName("John Cena");
     	id += 1;
     	defaultP0ses[johnCena.getID()] = johnCena;
+    	
+    	//"Kill Cena" pose
+    	angles = new ArrayList<Double>();
+    	angles.add(0.0);
+    	angles.add(180.0);
+    	Pose killCena = new Pose(angles, id);
+    	killCena.setName("Kill Cena");
+    	id += 1;
+    	defaultP0ses[killCena.getID()] = killCena;
     	
     	//"WMP" pose
     	angles = new ArrayList<Double>();
@@ -106,5 +115,8 @@ public class P0seData {
         
         Executable openWindowsMP = new Executable(new String[]{"cmd", "/c", "start", "C:\\Users\\Kieran\\Documents\\Secret_Track.mp3"}, Executable.WINDOWS_OS_HEADER);
         p0seExecutables_Windows.put(findPose("Win MP"), openWindowsMP);
+        
+        Executable killCenaWindows = new Executable(new String[]{"cmd", "/c", "taskkill", "/F", "/IM", "chrome.exe"}, Executable.WINDOWS_OS_HEADER);
+        p0seExecutables_Windows.put(findPose("Kill Cena"), killCenaWindows);
     }//method: loadDefaultExecutables
 }//class: P0seData

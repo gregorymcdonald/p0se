@@ -56,7 +56,7 @@ public class P0seRecognizer {
 		}
 
 		Pose result = new Pose(jointNodes);
-		//System.out.println(result.getAngles());
+		System.out.println(result.getAngles());
 		return result;
 	}//method: readPose
 
