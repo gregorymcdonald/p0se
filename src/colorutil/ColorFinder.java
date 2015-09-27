@@ -6,7 +6,11 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class ColorFinder {
-    private static final int NUM_TILES = 16;
+    private static final int NUM_TILES = 64;
+    
+    public static Rectangle[] findColor(BufferedImage image, Color color, ColorTolerance tolerance){
+        return new Rectangle[0];
+    }//method: findColor
     
     public static Rectangle[] findMatchingTiles(BufferedImage image, Color color, ColorTolerance tolerance){
         ArrayList<Rectangle> matchingTiles = new ArrayList<Rectangle>();
