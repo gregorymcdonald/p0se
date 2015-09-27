@@ -170,7 +170,7 @@ public class P0sePanel extends JPanel implements Runnable{
     
     private void highlightJoints(Graphics g){
         for(Color jointColor : jointColors){
-            Rectangle[] matchingTiles = ColorFinder.findMatchingTiles(inputImage, jointColor, jointColorTolerance);
+            Rectangle[] matchingTiles = ColorFinder.findColor(inputImage, jointColor, jointColorTolerance);
             
             //Draw rectangles of matched tiles
             Color negativeJointColor = ColorUtil.negateColor(jointColor);
