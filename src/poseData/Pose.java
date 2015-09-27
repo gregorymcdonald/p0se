@@ -7,7 +7,6 @@ public class Pose {
 	private ArrayList <JointNode> joints;
 	private ArrayList<Double> angles;
 	private int id;
-	private static final int TOLERANCE = 15;
 	
 	public Pose(ArrayList<JointNode> joints){
 		id = 1;
