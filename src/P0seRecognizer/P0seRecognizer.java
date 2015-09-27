@@ -35,10 +35,11 @@ public class P0seRecognizer {
 
 		for(int color = 0; color < jointNodeColors.length; color++){
 			Color currentColor = jointNodeColors[color];
-			JointNode node = new JointNode(ColorFinder.findColor(image, jointNodeColors[color], new ColorTolerance(60)), currentColor, color, new ColorTolerance(60));
-			if(node != null){
+			Point colorLocation = ColorFinder.findColor(image, currentColor, new ColorTolerance(30));
+			if(colorLocation != null){
+				JointNode node = new JointNode(colorLocation, currentColor, color, new ColorTolerance(30));
 				jointNodes.add(node);
-			}	
+			}
 		}
 
 		currentPose = new Pose(jointNodes);
@@ -61,8 +62,6 @@ public class P0seRecognizer {
 		System.out.println(currentPose.getAngles());
 		Runtime rt = Runtime.getRuntime();
 
-		System.out.println(System.getProperty("os.name").startsWith("Windows"));
-		System.out.println(System.getProperty("os.name"));
 		if(currentPose.equals(hardcodedPose, 30) && called == false){
 			if(System.getProperty("os.name").startsWith("Windows")){
 				try {

@@ -38,17 +38,26 @@ public class Pose {
 		// Angles to be calculated in reference to the first joint in the list
 		JointNode baseNode = joints.get(0);
 		for(JointNode joint : joints){
-			double angle = calculateAngle(baseNode.getLoc(), joint.getLoc());
-			angles.add(angle);
+			if(joint != null){
+				System.out.println(joint.getLoc());
+				double angle = calculateAngle(baseNode.getLoc(), joint.getLoc());
+				if(angle >= 0){
+					angles.add(angle);
+				}
+			}
 		}
 		return angles;
 	}
 	
 	private double calculateAngle(Point a, Point b){
-		final double deltaY = (a.y - b.y);
-	    final double deltaX = (b.x - a.x);
-	    final double result = Math.toDegrees(Math.atan2(deltaY, deltaX)); 
-	    return (result < 0) ? (360d + result) : result;
+		if(a != null && b != null){
+			final double deltaY = (a.y - b.y);
+		    final double deltaX = (b.x - a.x);
+		    final double result = Math.toDegrees(Math.atan2(deltaY, deltaX)); 
+		    return (result < 0) ? (360d + result) : result;
+		} else {
+			return -1;
+		}
 	}
 	
 	@Override
