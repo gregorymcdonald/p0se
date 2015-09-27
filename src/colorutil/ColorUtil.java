@@ -32,10 +32,15 @@ public class ColorUtil {
         int redTotal = 0;
         int greenTotal = 0;
         int blueTotal = 0;
+        int numPixels = 0;
         
         //Calculating total color channel values
         for(int x = region.x; x < region.x + region.width; x++){
             for(int y = region.y; y < region.y + region.height; y++){
+            	if(x > image.getWidth() || y > image.getHeight()){
+            		continue;
+            	}//if: trying to sample color out-of-bounds
+            	
                 int color =  image.getRGB(x,y); 
                 int red   = (color & 0x00ff0000) >> 16;
                 int green = (color & 0x0000ff00) >> 8;
@@ -44,11 +49,11 @@ public class ColorUtil {
                 redTotal += red;
                 greenTotal += green;
                 blueTotal += blue;
+                numPixels += 1;
             }//for: all y positions in the region
         }//for: all x positions in the regions
         
         //Calculating average color
-        int numPixels = region.width * region.height;
         int redAverage = redTotal / numPixels;
         int greenAverage = greenTotal / numPixels;
         int blueAverage = blueTotal / numPixels;
