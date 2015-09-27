@@ -104,7 +104,7 @@ public class P0seData {
         Executable openCenaMac = new Executable(new String[]{"open", "-a", "Google Chrome", "--new", "--args", "https://youtu.be/3HoZNpPTRDU?t=10s"}, Executable.MAC_OS_HEADER);
         p0seExecutables_Mac.put(findPose("John Cena"), openCenaMac);
         
-        Executable openWindowsMP = new Executable(new String[]{"cmd", "start", "Documents/Secret_Track.mp3"}, Executable.WINDOWS_OS_HEADER);
+        Executable openWindowsMP = new Executable(new String[]{"cmd", "/c", "start", "C:\\Users\\Kieran\\Documents\\Secret_Track.mp3"}, Executable.WINDOWS_OS_HEADER);
         p0seExecutables_Windows.put(findPose("Win MP"), openWindowsMP);
     }//method: loadDefaultExecutables
 }//class: P0seData
