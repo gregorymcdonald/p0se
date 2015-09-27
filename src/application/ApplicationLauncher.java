@@ -2,10 +2,12 @@ package application;
 
 import application.P0sePanel;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 
 public class ApplicationLauncher {
@@ -34,6 +36,12 @@ public class ApplicationLauncher {
         int initialX = (int)Math.round(screenWidth / 2.0 - p0sePanel.getWidth() / 2.0);
         int initialY = (int)Math.round(screenHeight / 2.0 - p0sePanel.getHeight() / 2.0);
         applicationFrame.setLocation(initialX, initialY);
+        
+        // Add Capture Button
+        JButton capture = new JButton("Capture");
+        capture.setPreferredSize(new Dimension(500, 100));
+        p0sePanel.setLayout(new BorderLayout());
+        p0sePanel.add(capture, BorderLayout.SOUTH);
         
         //Required to make the frame visible
         applicationFrame.setVisible(true);
