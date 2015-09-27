@@ -40,6 +40,7 @@ public class P0sePanel extends JPanel implements Runnable{
     private static BufferedImage inputImage;
     //Taskbar Display
     private static final int TASKBAR_HEIGHT = 96;
+    private static Color taskbarBackgroundColor;
     
     /* ***** P0SE FIELDS ***** */
     private static Webcam inputDevice;
@@ -59,6 +60,9 @@ public class P0sePanel extends JPanel implements Runnable{
         
         //Input Display Area
         inputDisplayArea = new Rectangle(0, 0, 256, 256);
+        
+        //Taskbar
+        taskbarBackgroundColor = new Color(255, 255, 255);
         
         //Default p0se values
         jointColorTolerance = new ColorTolerance(60);
@@ -121,6 +125,8 @@ public class P0sePanel extends JPanel implements Runnable{
         drawInputImage(g);
         highlightJoints(g);
         
+        drawTaskbar(g);
+        
         drawDebugInfo(g);
     }//method: paint
     
@@ -145,9 +151,10 @@ public class P0sePanel extends JPanel implements Runnable{
                 scaledWidth = (int)Math.round(inputImage.getWidth() * heightRatio);
                 scaledHeight = (int)Math.round(inputImage.getHeight() * heightRatio);
             }//else: the width ratio is greater, scale by height
-            int centerXOffset = (int)Math.round(inputDisplayArea.width / 2.0 - (scaledWidth / 2.0));
-            int centerYOffset = (int)Math.round(inputDisplayArea.height / 2.0 - (scaledHeight / 2.0));
-            g.drawImage(inputImage, centerXOffset, centerYOffset, scaledWidth, scaledHeight, null);
+            //int centerXOffset = (int)Math.round(inputDisplayArea.width / 2.0 - (scaledWidth / 2.0));
+            //int centerYOffset = (int)Math.round(inputDisplayArea.height / 2.0 - (scaledHeight / 2.0));
+            //g.drawImage(inputImage, centerXOffset, centerYOffset, scaledWidth, scaledHeight, null);
+            g.drawImage(inputImage, 0, 0, scaledWidth, scaledHeight, null);
         }//if: image is set to fill the ENTIRE input display area
         else{
             int centerXOffset = inputDisplayArea.width / 2 - inputImage.getWidth() / 2;
@@ -196,7 +203,8 @@ public class P0sePanel extends JPanel implements Runnable{
                     int scaledY = (int)Math.round(rect.y * heightRatio);
                     int scaledWidth = (int)Math.round(rect.width * widthRatio);
                     int scaledHeight = (int)Math.round(rect.height * heightRatio);
-                    g.drawRect(scaledX + centerXOffset, scaledY + centerYOffset, scaledWidth, scaledHeight);
+                    //g.drawRect(scaledX + centerXOffset, scaledY + centerYOffset, scaledWidth, scaledHeight);
+                    g.drawRect(scaledX, scaledY, scaledWidth, scaledHeight);
                 }//for: all matching tiles
             }//else if: image is set to fit to input display area
             else{
@@ -209,6 +217,11 @@ public class P0sePanel extends JPanel implements Runnable{
             }//else: image does not fill display area
         }//for: all colors in jointColor
     }//method: highlight
+    
+    private void drawTaskbar(Graphics g){
+        g.setColor(taskbarBackgroundColor);
+        g.fillRect(0, getHeight() - TASKBAR_HEIGHT, getWidth(), TASKBAR_HEIGHT);
+    }//method: drawTaskbar
     
     private void drawDebugInfo(Graphics g){
         if(DEBUG_MODE){
