@@ -2,11 +2,11 @@ package P0seRecognizer;
 
 import java.awt.Color;
 import java.awt.Point;
-
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import application.P0seData;
 import poseData.JointNode;
 import poseData.Pose;
 import colorutil.ColorFinder;
@@ -33,11 +33,12 @@ public class P0seRecognizer {
 	public void updateNodeLocations(BufferedImage image){
 		jointNodes = new ArrayList<JointNode>();//resets the array for the new NodeJoints that will be captured in the new image
 
-		for(int color = 0; color < jointNodeColors.length; color++){
-			Color currentColor = jointNodeColors[color];
-			Point colorLocation = ColorFinder.findColor(image, currentColor, new ColorTolerance(30));
+		for(int i = 0; i < P0seData.DEFAULT_JOINT_NODE_COLORS.length; i++){
+			Color currentColor = P0seData.DEFAULT_JOINT_NODE_COLORS[i].color;
+			ColorTolerance currentTolerance = P0seData.DEFAULT_JOINT_NODE_COLORS[i].tolerance;
+			Point colorLocation = ColorFinder.findColor(image, currentColor, currentTolerance);
 			if(colorLocation != null){
-				JointNode node = new JointNode(colorLocation, currentColor, color, new ColorTolerance(30));
+				JointNode node = new JointNode(colorLocation, currentColor, i, currentTolerance);
 				jointNodes.add(node);
 			}
 		}

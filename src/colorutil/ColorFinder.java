@@ -150,6 +150,9 @@ public class ColorFinder {
     }//method: mergeRectangles
     
     public static Rectangle[] findMatchingTiles(BufferedImage image, Color color, ColorTolerance tolerance){
+        if(image == null || color == null || tolerance == null){
+            return new Rectangle[0];
+        }//if: invalid input
         ArrayList<Rectangle> matchingTiles = new ArrayList<Rectangle>();
         //matchingTiles.add(new Rectangle(100, 100, 16, 16)); //debugging
         

@@ -50,12 +50,12 @@ public class P0sePanel extends JPanel implements Runnable{
     /* ***** P0SE FIELDS ***** */
     private static P0seRecognizer p0seRecognizer;
     private static Webcam inputDevice;
-    private static ColorTolerance jointColorTolerance;
-    private static Color[] jointColors = {
-        new Color(255, 255, 255),
-        new Color(48, 114, 139),
-        new Color(167, 175, 71)
-    };
+    //private static ColorTolerance jointColorTolerance;
+    //private static Color[] jointColors = {
+    //    new Color(255, 255, 255),
+    //    new Color(48, 114, 139),
+    //    new Color(167, 175, 71)
+    //};
     
     /* ***** CONSTRUCTORS ***** */
     public P0sePanel(){
@@ -72,7 +72,7 @@ public class P0sePanel extends JPanel implements Runnable{
         
         //Default p0se values
         p0seRecognizer = new P0seRecognizer();
-        jointColorTolerance = new ColorTolerance(30);
+        //jointColorTolerance = new ColorTolerance(30);
         
         //Image Capture Thread
         Thread imageCaptureThread = new Thread(this);
@@ -179,6 +179,87 @@ public class P0sePanel extends JPanel implements Runnable{
     
     private void highlightJoints(Graphics g){
         //TODO: Reformat to have outer for loop, with checks interior
+        for(ColorPair jointColorPair : P0seData.DEFAULT_JOINT_NODE_COLORS){
+            Color jointColor = jointColorPair.color;
+            ColorTolerance jointColorTolerance = jointColorPair.tolerance;
+            
+            //Set the graphics object to draw with the negative color
+            Color negativeJointColor = ColorUtil.negateColor(jointColor);
+            g.setColor(negativeJointColor);
+            
+            if(HIGHLIGHT_AVERAGE_COLOR_POINTS){
+                Point matchingPoint = ColorFinder.findColor(inputImage, jointColor, jointColorTolerance);
+                if(matchingPoint == null){
+                    continue;
+                }//if: no matching point was found
+                
+                if(FIT_INPUT_DISPLAY_AREA){
+                    double widthRatio = ((double)inputDisplayArea.width) / ((double)inputImage.getWidth());
+                    double heightRatio = ((double)inputDisplayArea.height) / ((double)inputImage.getHeight());
+                    if(heightRatio >= widthRatio){
+                        heightRatio = widthRatio;
+                    }//if: the height ratio is greater than the width ratio, scale by width
+                    else{
+                        widthRatio = heightRatio;
+                    }//else: the width ratio is greater, scale by height
+                    int centerXOffset = (int)Math.round(inputDisplayArea.width / 2.0 - ((inputImage.getWidth() * widthRatio) / 2.0));
+                    int centerYOffset = (int)Math.round(inputDisplayArea.height / 2.0 - ((inputImage.getHeight() * heightRatio) / 2.0));
+                    int scaledX = (int)Math.round(matchingPoint.x * widthRatio);
+                    int scaledY = (int)Math.round(matchingPoint.y * heightRatio);
+                    g.fillOval(scaledX + centerXOffset, scaledY + centerYOffset, 10, 10);
+                }//if: fitting input to display area
+            }//if: HIGHLIGHT_AVERAGE_COLOR_POINTS is true
+            
+            if(HIGHLIGHT_JOINT_COLOR_REGIONS){
+                Rectangle[] matchingTiles = ColorFinder.findColorRegions(inputImage, jointColor, jointColorTolerance);
+                if(matchingTiles.length == 0){
+                    continue;
+                }//if: no matching tiles found
+                
+                if(FILL_INPUT_DISPLAY_AREA){
+                    double widthRatio = ((double)inputDisplayArea.width) / ((double)inputImage.getWidth());
+                    double heightRatio = ((double)inputDisplayArea.height) / ((double)inputImage.getHeight());
+                    for(Rectangle rect : matchingTiles){
+                        int scaledX = (int)Math.round(rect.x * widthRatio);
+                        int scaledY = (int)Math.round(rect.y * heightRatio);
+                        int scaledWidth = (int)Math.round(rect.width * widthRatio);
+                        int scaledHeight = (int)Math.round(rect.height * heightRatio);
+                        g.drawRect(scaledX, scaledY, scaledWidth, scaledHeight);
+                    }//for: all matching tiles
+                }//if: image is set to fill the input display area
+                else if(FIT_INPUT_DISPLAY_AREA){
+                    double widthRatio = ((double)inputDisplayArea.width) / ((double)inputImage.getWidth());
+                    double heightRatio = ((double)inputDisplayArea.height) / ((double)inputImage.getHeight());
+                    if(heightRatio >= widthRatio){
+                        heightRatio = widthRatio;
+                    }//if: the height ratio is greater than the width ratio, scale by width
+                    else{
+                        widthRatio = heightRatio;
+                    }//else: the width ratio is greater, scale by height
+                    
+                    int centerXOffset = (int)Math.round(inputDisplayArea.width / 2.0 - ((inputImage.getWidth() * widthRatio) / 2.0));
+                    int centerYOffset = (int)Math.round(inputDisplayArea.height / 2.0 - ((inputImage.getHeight() * heightRatio) / 2.0));
+                    for(Rectangle rect : matchingTiles){
+                        int scaledX = (int)Math.round(rect.x * widthRatio);
+                        int scaledY = (int)Math.round(rect.y * heightRatio);
+                        int scaledWidth = (int)Math.round(rect.width * widthRatio);
+                        int scaledHeight = (int)Math.round(rect.height * heightRatio);
+                        g.drawRect(scaledX + centerXOffset, scaledY + centerYOffset, scaledWidth, scaledHeight);
+                        //g.drawRect(scaledX, scaledY, scaledWidth, scaledHeight);
+                    }//for: all matching tiles
+                }//else if: image is set to fit to input display area
+                else{
+                    //TODO: Make this inputDisplayArea handle height being too small
+                    int centerXOffset = inputDisplayArea.width / 2 - inputImage.getWidth() / 2;
+                    int centerYOffset = inputDisplayArea.height / 2 - inputImage.getHeight() / 2;
+                    for(Rectangle rect : matchingTiles){
+                        g.drawRect(rect.x + centerXOffset, rect.y + centerYOffset, rect.width, rect.height);
+                    }//for: all matching tiles
+                }//else: image does not fill display area
+            }//if: HIGHLIGHT_JOINT_COLOR_REGIONS is true
+        }//for: all joint color pairs, in the default array
+        
+        /*
         if(HIGHLIGHT_AVERAGE_COLOR_POINTS){
             for(Color jointColor : jointColors){
                 Color negativeJointColor = ColorUtil.negateColor(jointColor);
@@ -254,6 +335,7 @@ public class P0sePanel extends JPanel implements Runnable{
                 }//else: image does not fill display area
             }//for: all colors in jointColor
         }//if: HIGHLIGHT_JOINT_COLOR_REGIONS is true
+        */
     }//method: highlight
     
     private void drawTaskbar(Graphics g){
