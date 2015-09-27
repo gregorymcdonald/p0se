@@ -37,7 +37,7 @@ public class ColorUtil {
         //Calculating total color channel values
         for(int x = region.x; x < region.x + region.width; x++){
             for(int y = region.y; y < region.y + region.height; y++){
-            	if(x > image.getWidth() || y > image.getHeight()){
+            	if(x >= image.getWidth() || y >= image.getHeight()){
             		continue;
             	}//if: trying to sample color out-of-bounds
             	

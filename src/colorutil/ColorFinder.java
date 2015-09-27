@@ -6,9 +6,29 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class ColorFinder {
-    private static final int TILE_SIZE_DIVISOR = 64;
+    private static final int TILE_SIZE_DIVISOR = 32;
     
     public static Rectangle[] findColor(BufferedImage image, Color color, ColorTolerance tolerance){
+        Rectangle[] colorTiles = findMatchingTiles(image, color, tolerance);
+        if(colorTiles.length == 0){
+            return new Rectangle[0];
+        }//if: no color was found
+        
+        int totalX = 0;
+        int totalY = 0;
+        for(int i = 0; i < colorTiles.length; i++){
+            totalX += colorTiles[i].x;
+            totalY += colorTiles[i].y;
+        }//for: all color tiles
+        int averageX = (totalX / colorTiles.length);
+        int averageY = (totalY / colorTiles.length);
+        Rectangle[] result = new Rectangle[1];
+        result[0] = new Rectangle(averageX, averageY, 4, 4);
+        return result;
+    }//method: findColor
+    
+    public static Rectangle[] findColorRegions(BufferedImage image, Color color, ColorTolerance tolerance){
+        //Alternative Solution: Recursive flood fill of colorTiles
         Rectangle[] colorTiles = findMatchingTiles(image, color, tolerance);
         if(colorTiles.length == 0){
             return new Rectangle[0];
@@ -36,7 +56,7 @@ public class ColorFinder {
                 rectangleGroupings.add(group);
             }//if: not grouped, add to a new group
         }//for: all color tiles
-        System.out.println(rectangleGroupings.size() + " rectangle groupings found");
+        //System.out.println(rectangleGroupings.size() + " rectangle groupings found");
         
         //Construct overall color group rectangles
         ArrayList<Rectangle> colorGroups = new ArrayList<Rectangle>();
@@ -81,8 +101,9 @@ public class ColorFinder {
                         
                         //Remove merged rect, and adjust counters
                         colorGroups.set(i, mergeResult);
+                        current = mergeResult;
                         colorGroups.remove(j);
-                        j--;
+                        j = 0;
                     }
                 }//if: not looking at yourself
             }//for: all rectangles in colorGroups
