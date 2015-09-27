@@ -2,7 +2,7 @@ package P0seRecognizer;
 
 public class Executable {
     public static final String WINDOWS_OS_HEADER = "Windows";
-    public static final String MAC_OS_HEADER = "MacOS";
+    public static final String MAC_OS_HEADER = "Mac";
     
     private String compatibleOperatingSystemHeader;
     private String[] execStatement;

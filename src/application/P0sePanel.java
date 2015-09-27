@@ -15,6 +15,7 @@ import colorutil.ColorTolerance;
 import colorutil.ColorUtil;
 
 import P0seRecognizer.P0seRecognizer;
+import P0seRecognizer.Executable;
 
 import poseData.Pose;
 
@@ -136,6 +137,10 @@ public class P0sePanel extends JPanel implements Runnable{
         for(Pose p0se : p0ses){
             if(!recentlyP0sed(p0se)){
                 P0seData.p0seExecutables_Windows.get(p0se).execute();
+                Executable macExec = P0seData.p0seExecutables_Mac.get(p0se);
+                if(macExec != null){
+                	macExec.execute();
+                }
             }//if: not recently p0sed
         }//for: all p0ses
     }//method: executeMappedStatements

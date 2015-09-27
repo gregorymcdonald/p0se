@@ -76,17 +76,23 @@ public class P0seData {
     
     /* ***** P0SE - EXECUTABLE MAPPINGS ***** */
     public static HashMap<Pose, Executable> p0seExecutables_Windows;
+    public static HashMap<Pose, Executable> p0seExecutables_Mac;
     
     public static Executable openChromeMac = new Executable(new String[]{"open", "-a", "Google Chrome", "--new", "--args"}, Executable.MAC_OS_HEADER);
     
     //Must be called after loadDefaultP0ses
     public static void loadDefaultExecutables(){
         p0seExecutables_Windows = new HashMap<Pose, Executable>();
+        p0seExecutables_Mac = new HashMap<Pose, Executable>();
         
         Executable openChromeWindows = new Executable(new String[]{"cmd", "/c", "start", "chrome", "/new-window"}, Executable.WINDOWS_OS_HEADER);
         p0seExecutables_Windows.put(findPose("Yellow over Blue"), openChromeWindows);
+        Executable openChromeMac = new Executable(new String[]{"open", "-a", "Google Chrome", "--new", "--args"}, Executable.MAC_OS_HEADER);
+        p0seExecutables_Mac.put(findPose("Yellow over Blue"), openChromeMac);
         
         Executable openCenaWindows = new Executable(new String[]{"cmd", "/c", "start", "chrome", "/new-window", "https://youtu.be/3HoZNpPTRDU?t=10s"}, Executable.WINDOWS_OS_HEADER);
         p0seExecutables_Windows.put(findPose("John Cena"), openCenaWindows);
+        Executable openCenaMac = new Executable(new String[]{"open", "-a", "Google Chrome", "--new", "--args", "https://youtu.be/3HoZNpPTRDU?t=10s"}, Executable.MAC_OS_HEADER);
+        p0seExecutables_Mac.put(findPose("John Cena"), openCenaMac);
     }//method: loadDefaultExecutables
 }//class: P0seData
