@@ -33,7 +33,7 @@ public class P0seRecognizer {
 		for(int color = 0; color < jointNodeColors.length; color++){
 			Color currentColor = jointNodeColors[color];
 			ColorTolerance tolerance = new ColorTolerance(60);
-			JointNode node = new JointNode(ColorFinder.findColor(image, jointNodeColors[color], tolerance), currentColor, color);
+			JointNode node = new JointNode(ColorFinder.findColor(image, jointNodeColors[color], tolerance), currentColor, color, new ColorTolerance(60));
 			JointNodes.add(node);	
 		}
 	}

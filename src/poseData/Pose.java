@@ -1,17 +1,33 @@
 package poseData;
 
 import java.awt.Point;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Pose {
 	private ArrayList <JointNode> joints;
 	private ArrayList<Double> angles;
 	private int id;
 	
+	// Static Vars
+	private static ArrayList<Integer> ids;
+	
 	public Pose(ArrayList<JointNode> joints){
 		id = 1;
+		ids.add(id);
 		this.joints = joints;
 		angles = generateAngles(this.joints);
+	}
+	
+	public Pose(ArrayList<Double> angles, int id){
+		this.id = id;
+		this.angles = angles;
 	}
 	
 	private ArrayList<Double> generateAngles(ArrayList<JointNode> joints){
@@ -62,5 +78,27 @@ public class Pose {
 			}
 		}
 		return true;
+	}
+	
+	public void savePose() throws IOException{
+		// Write out a representation of the angles to a file
+		String fileName = "p0se" + this.id + ".txt";
+		FileWriter writer = new FileWriter(fileName);
+		for(int i = 0; i < angles.size(); i++){
+			writer.write(this.angles.get(i) + "\n");
+		}
+		writer.close();
+	}
+	
+	private static Pose readPose(int id){
+		Scanner sc = new Scanner("p0se" + id + ".txt");
+		ArrayList<Double> readAngles = new ArrayList<Double>();
+		while(sc.hasNextLine()){
+			String line = sc.nextLine();
+			double angle = Double.parseDouble(line);
+			readAngles.add(angle);
+		}
+		sc.close();
+		return new Pose(readAngles, id);
 	}
 }
