@@ -17,7 +17,7 @@ public class P0seData {
     //private static ColorTolerance whiteNodeTolerance = new ColorTolerance(30);
     
     //Yellow Node Color
-    private static Color yellowNodeColor = new Color(189, 211, 67);
+    private static Color yellowNodeColor = new Color(160, 179, 60);
     private static ColorTolerance yellowNodeTolerance = new ColorTolerance(30);
     
     private static Color blueNodeColor = new Color(18, 110, 169);

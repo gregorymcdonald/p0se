@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class ColorFinder {
-    private static final int TILE_SIZE_DIVISOR = 32;
+    private static final int TILE_SIZE_DIVISOR = 64;
     
     public static Point findColor(BufferedImage image, Color color, ColorTolerance tolerance){
         Rectangle[] colorTiles = findMatchingTiles(image, color, tolerance);
