@@ -60,7 +60,7 @@ public class P0seRecognizer {
 
 		Pose hardcodedPose = new Pose(testObject,1);
 
-		System.out.println(currentPose.getAngles());
+		//System.out.println(currentPose.getAngles()); //DEBUGGING
 		Runtime rt = Runtime.getRuntime();
 
 		if(currentPose.equals(hardcodedPose, 30) && called == false){

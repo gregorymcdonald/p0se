@@ -10,10 +10,10 @@ public class P0seData {
     //private static ColorTolerance whiteNodeTolerance = new ColorTolerance(30);
     
     //Yellow Node Color
-    private static Color yellowNodeColor = new Color(167, 175, 71);
+    private static Color yellowNodeColor = new Color(150, 150, 30);
     private static ColorTolerance yellowNodeTolerance = new ColorTolerance(30);
     
-    private static Color blueNodeColor = new Color(48, 114, 139);
+    private static Color blueNodeColor = new Color(30, 60, 80);
     private static ColorTolerance blueNodeTolerance = new ColorTolerance(30);
     
     public static final ColorPair[] DEFAULT_JOINT_NODE_COLORS = {

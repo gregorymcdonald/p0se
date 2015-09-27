@@ -39,7 +39,7 @@ public class Pose {
 		JointNode baseNode = joints.get(0);
 		for(JointNode joint : joints){
 			if(joint != null){
-				System.out.println(joint.getLoc());
+				//System.out.println(joint.getLoc()); //DEBUGGING
 				double angle = calculateAngle(baseNode.getLoc(), joint.getLoc());
 				if(angle >= 0){
 					angles.add(angle);
