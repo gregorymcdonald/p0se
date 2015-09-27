@@ -111,7 +111,7 @@ public class P0sePanel extends JPanel implements Runnable{
     		//Match with default p0ses
     		Pose[] matchingP0ses = p0seRecognizer.matchPose(currentPose, P0seData.defaultP0ses);
     		//execute matching poses
-    		
+    		executeMappedStatements(matchingP0ses);
     		//add to recent p0ses
     		addToRecentP0ses(matchingP0ses);
     		
@@ -131,7 +131,15 @@ public class P0sePanel extends JPanel implements Runnable{
     	}//catch: all exceptions
     	return false;
     }//method: delay
-  
+    
+    private void executeMappedStatements(Pose[] p0ses){
+        for(Pose p0se : p0ses){
+            if(!recentlyP0sed(p0se)){
+                P0seData.p0seExecutables_Windows.get(p0se.getName());
+            }//if: not recently p0sed
+        }//for: all p0ses
+    }//method: executeMappedStatements
+    
     private void updateRecentP0ses(){
     	for(int i = 0; i < recentP0ses.size(); i++){
     		P0seTimer recentP0se = recentP0ses.get(i);
