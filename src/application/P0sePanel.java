@@ -135,7 +135,7 @@ public class P0sePanel extends JPanel implements Runnable{
     private void executeMappedStatements(Pose[] p0ses){
         for(Pose p0se : p0ses){
             if(!recentlyP0sed(p0se)){
-                P0seData.p0seExecutables_Windows.get(p0se.getName());
+                P0seData.p0seExecutables_Windows.get(p0se).execute();
             }//if: not recently p0sed
         }//for: all p0ses
     }//method: executeMappedStatements

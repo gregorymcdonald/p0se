@@ -41,7 +41,7 @@ public class P0seData {
     
     public static void loadDefaultP0ses(){
     	//Initialize default HashMap
-    	defaultP0ses = new Pose[1];
+    	defaultP0ses = new Pose[2];
     	
     	int id = 0;
     	
@@ -53,6 +53,15 @@ public class P0seData {
     	yellowOverBlue.setName("Yellow over Blue");
     	id += 1;
     	defaultP0ses[yellowOverBlue.getID()] = yellowOverBlue;
+    	
+    	//"John Cena" pose
+    	angles = new ArrayList<Double>();
+    	angles.add(0.0);
+    	angles.add(0.0);
+    	Pose johnCena = new Pose(angles, id);
+    	johnCena.setName("John Cena");
+    	id += 1;
+    	defaultP0ses[johnCena.getID()] = johnCena;
     }//method: loadDefaultPoses
     
     public static Pose findPose(String name){
@@ -68,13 +77,16 @@ public class P0seData {
     /* ***** P0SE - EXECUTABLE MAPPINGS ***** */
     public static HashMap<Pose, Executable> p0seExecutables_Windows;
     
-    public static Executable openChromeWindows = new Executable(new String[]{"cmd", "/c", "start", "chrome", "/new-window"}, Executable.WINDOWS_OS_HEADER);
     public static Executable openChromeMac = new Executable(new String[]{"open", "-a", "Google Chrome", "--new", "--args"}, Executable.MAC_OS_HEADER);
     
     //Must be called after loadDefaultP0ses
     public static void loadDefaultExecutables(){
         p0seExecutables_Windows = new HashMap<Pose, Executable>();
         
+        Executable openChromeWindows = new Executable(new String[]{"cmd", "/c", "start", "chrome", "/new-window"}, Executable.WINDOWS_OS_HEADER);
         p0seExecutables_Windows.put(findPose("Yellow over Blue"), openChromeWindows);
+        
+        Executable openCenaWindows = new Executable(new String[]{"cmd", "/c", "start", "chrome", "/new-window", "https://youtu.be/3HoZNpPTRDU?t=10s"}, Executable.WINDOWS_OS_HEADER);
+        p0seExecutables_Windows.put(findPose("John Cena"), openCenaWindows);
     }//method: loadDefaultExecutables
 }//class: P0seData
